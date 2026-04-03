@@ -66,35 +66,10 @@ def retrieve(state: GraphState):
 
 def grade_documents(state: GraphState):
     """Determines whether the retrieved context contains relevant information (Optimized to Single Pass)."""
-    print("---CHECK DOCUMENT RELEVANCE TO QUESTION---")
-    question = state["question"]
-    documents = state["documents"]
-    model_name = state["model_name"]
-    
-    if not documents:
-        return {"documents": [], "question": question}
-    
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a grader assessing relevance of retrieved context to a user question. \n"
-         "If the context contains keyword(s) or semantic meaning related to the question, grade it as relevant. \n"
-         "Give a binary score 'yes' or 'no' score to indicate if it's relevant. DO NOT EXPLAIN, ONLY OUTPUT 'yes' OR 'no'."),
-        ("human", "Retrieved context: \n\n {context} \n\n User question: {question}"),
-    ])
-    
-    # Strictly cap token generation to 2 tokens. We only want 'yes' or 'no', saving massive compute time!
-    llm = ChatOllama(model=model_name, temperature=0, num_predict=2)
-    chain = prompt | llm | StrOutputParser()
-    
-    # Pack everything into one check to massively speed up local inference
-    combined_docs = "\n\n".join([d.page_content for d in documents])
-    score = chain.invoke({"question": question, "context": combined_docs})
-    
-    if "yes" in score.lower():
-        # Keep documents as they contain relevant data
-        return {"documents": documents, "question": question}
-    else:
-        # None of them were relevant
-        return {"documents": [], "question": question}
+    print("---CHECK DOCUMENT RELEVANCE TO QUESTION (HARDWARE SPEED BYPASS)---")
+    # To prevent 2-5 minute execution times on local hardware, we completely bypass 
+    # the LLM grader. It will now instantly pass all retrieved docs to the generator.
+    return {"documents": state["documents"], "question": state["question"]}
 
 def generate(state: GraphState):
     """Generate answer."""
@@ -109,7 +84,7 @@ def generate(state: GraphState):
     llm = ChatOllama(model=model_name, temperature=0.2)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an intelligent information assistant. Use the following context to answer the question.\n\nContext:\n{context}"),
+        ("system", "You are an intelligent information assistant. Use the following context to answer the question.\n\nKeep your answer extremely brief and concise, maximum 1-3 sentences! Do not ramble.\n\nContext:\n{context}"),
         ("human", "{question}"),
     ])
     

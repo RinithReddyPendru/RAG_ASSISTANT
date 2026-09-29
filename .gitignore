@@ -6,3 +6,5 @@ data/
 backend.zip
 .env
 .vercel/
+
+.vercel

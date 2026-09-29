@@ -111,18 +111,25 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <div class="section-title">KNOWLEDGE VAULT</div>
+                    <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>KNOWLEDGE VAULT</span>
+                        <button type="button" id="clear-vault-btn" class="clear-vault-pill-btn" title="Purge all documents and erase memory">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            <span>Erase Memory</span>
+                        </button>
+                    </div>
                     <div class="drop-zone" id="drop-zone">
                         <div class="drop-icon">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                         </div>
                         <div class="drop-text">
-                            <strong>Drop PDF / TXT research papers</strong>
+                            <strong>Drop PDF / TXT / MD files</strong>
                             <span>or click to browse files</span>
                         </div>
-                        <input type="file" id="file-input" accept=".pdf,.txt" hidden>
+                        <input type="file" id="file-input" accept=".pdf,.txt,.md,.json,.csv" hidden multiple>
                     </div>
                     <div id="upload-status" class="status-msg hidden"></div>
+                    <div id="vault-files-list" class="vault-files-list"></div>
                 </div>
 
                 <!-- Live System Telemetry Card -->
@@ -130,19 +137,19 @@
                     <div class="section-title">PERFORMANCE METRICS</div>
                     <div class="telemetry-grid">
                         <div class="telemetry-metric">
-                            <span class="metric-val" id="metric-accuracy">75.0%</span>
+                            <span class="metric-val" id="metric-accuracy">--</span>
                             <span class="metric-lbl">Accuracy</span>
                         </div>
                         <div class="telemetry-metric">
-                            <span class="metric-val" id="metric-recall">83.0%</span>
-                            <span class="metric-lbl">Fact Recall</span>
+                            <span class="metric-val" id="metric-recall">0 Docs</span>
+                            <span class="metric-lbl">Indexed Docs</span>
                         </div>
                         <div class="telemetry-metric">
-                            <span class="metric-val" id="metric-cache">&lt;50ms</span>
-                            <span class="metric-lbl">L1 Cache</span>
+                            <span class="metric-val" id="metric-cache">0 Chunks</span>
+                            <span class="metric-lbl">Vault Chunks</span>
                         </div>
                         <div class="telemetry-metric">
-                            <span class="metric-val" id="metric-entities">70</span>
+                            <span class="metric-val" id="metric-entities">0</span>
                             <span class="metric-lbl">KG Entities</span>
                         </div>
                     </div>
@@ -152,17 +159,17 @@
                 <div class="sidebar-section">
                     <div class="section-title">RESEARCH PROMPTS</div>
                     <div class="prompt-chips">
-                        <button type="button" class="prompt-chip" data-prompt="What are the six major structural gaps in Indian dental insurance?">
-                            <span>Indian Dental Insurance Gaps</span>
+                        <button type="button" class="prompt-chip" data-prompt="Summarize the core findings and methodology from the uploaded documents.">
+                            <span>Document Summary</span>
                         </button>
-                        <button type="button" class="prompt-chip" data-prompt="What neuron model in spiking neural networks integrates incoming spikes to reach a membrane threshold?">
-                            <span>Spiking Neural Networks & STDP</span>
+                        <button type="button" class="prompt-chip" data-prompt="Extract the key entities, definitions, and relationships in the uploaded knowledge.">
+                            <span>Key Entities & Relations</span>
                         </button>
-                        <button type="button" class="prompt-chip" data-prompt="What are the trimester-specific dietary macronutrient guidelines for pregnancy?">
-                            <span>Maternal Nutrition Guidelines</span>
+                        <button type="button" class="prompt-chip" data-prompt="What are the primary technical limitations, trade-offs, or challenges identified?">
+                            <span>Limitations & Challenges</span>
                         </button>
-                        <button type="button" class="prompt-chip" data-prompt="How does the Entity Density Index balance vector weights and graph weights during DW-RRF?">
-                            <span>Dynamic-Weighted RRF (EDI)</span>
+                        <button type="button" class="prompt-chip" data-prompt="List all quantitative metrics, benchmark scores, or experimental numbers mentioned.">
+                            <span>Metrics & Benchmarks</span>
                         </button>
                     </div>
                 </div>
@@ -181,30 +188,30 @@
                     <div class="chat-messages" id="chat-messages">
                         <!-- Hero Banner on First Run -->
                         <div class="welcome-hero" id="welcome-hero">
-                            <div class="hero-badge">Autonomous Multi-Strategy RAG</div>
-                            <h2 class="hero-title">Adaptive Cross-Domain Intelligence</h2>
-                            <p class="hero-desc">Dynamically routes questions between dense semantic embeddings, multi-hop knowledge graph traversals, and dynamic-weighted reciprocal rank fusion with neural cross-encoder reranking.</p>
+                            <div class="hero-badge">Clean Slate • Learn From Scratch</div>
+                            <h2 class="hero-title">Adaptive Knowledge Vault</h2>
+                            <p class="hero-desc">Your assistant starts with a completely clean memory. Drop research papers, text files, or notes into the Knowledge Vault to dynamically index chunks, construct an entity graph, and query your material.</p>
                             
                             <div class="hero-cards">
-                                <div class="hero-card" data-prompt="What are the six major structural gaps in Indian dental insurance?">
-                                    <div class="hero-card-tag">Healthcare Systems</div>
-                                    <div class="hero-card-title">Indian Dental Insurance</div>
-                                    <div class="hero-card-sub">Six structural gaps, waiting periods, Ayushman Bharat PM-JAY, and preventive AMC models.</div>
+                                <div class="hero-card" data-prompt="Summarize the core findings and methodology from the uploaded documents.">
+                                    <div class="hero-card-tag">Research Ingestion</div>
+                                    <div class="hero-card-title">Document Synthesis</div>
+                                    <div class="hero-card-sub">Extract core abstracts, key methodologies, and essential findings with interactive citation anchors.</div>
                                 </div>
-                                <div class="hero-card" data-prompt="What neuron model in spiking neural networks integrates incoming spikes to reach a membrane threshold?">
-                                    <div class="hero-card-tag">Neuromorphic AI</div>
-                                    <div class="hero-card-title">Spiking Neural Networks</div>
-                                    <div class="hero-card-sub">Leaky integrate-and-fire (LIF) dynamics, memristive crossbars, and STDP synaptic plasticity.</div>
+                                <div class="hero-card" data-prompt="Extract the key entities, definitions, and relationships in the uploaded knowledge.">
+                                    <div class="hero-card-tag">Relational Reasoning</div>
+                                    <div class="hero-card-title">Entity Graph Extraction</div>
+                                    <div class="hero-card-sub">Traverse multi-hop relationships and structural connections discovered from your uploaded content.</div>
                                 </div>
-                                <div class="hero-card" data-prompt="What are the trimester-specific dietary macronutrient guidelines for pregnancy?">
-                                    <div class="hero-card-tag">Clinical Guidelines</div>
-                                    <div class="hero-card-title">Maternal Health Models</div>
-                                    <div class="hero-card-sub">Trimester caloric increments, neural tube defect prevention, and rural ASHA clinical delivery.</div>
+                                <div class="hero-card" data-prompt="What are the primary technical limitations, trade-offs, or challenges identified?">
+                                    <div class="hero-card-tag">Critical Analysis</div>
+                                    <div class="hero-card-title">Trade-offs & Challenges</div>
+                                    <div class="hero-card-sub">Identify unstated assumptions, bottlenecks, and open problems across your knowledge base.</div>
                                 </div>
-                                <div class="hero-card" data-prompt="How does the Entity Density Index balance vector weights and graph weights during DW-RRF?">
-                                    <div class="hero-card-tag">Architecture</div>
-                                    <div class="hero-card-title">Adaptive DW-RRF Formulation</div>
-                                    <div class="hero-card-sub">Entity Density Index (EDI), dynamic lambda balancing, and FlashRank cross-encoder reranking.</div>
+                                <div class="hero-card" data-prompt="List all quantitative metrics, benchmark scores, or experimental numbers mentioned.">
+                                    <div class="hero-card-tag">Empirical Data</div>
+                                    <div class="hero-card-title">Metrics & Quantitative Scores</div>
+                                    <div class="hero-card-sub">Surface exact accuracy percentages, latency numbers, and statistical measurements.</div>
                                 </div>
                             </div>
                         </div>

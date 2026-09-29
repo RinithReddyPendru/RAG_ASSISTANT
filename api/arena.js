@@ -16,26 +16,30 @@ export default async function handler(req, res) {
     try { body = JSON.parse(body); } catch (e) {}
   }
 
-  const { message = '', query = '' } = body || {};
+  const { message = '', query = '', client_chunks = null, chunks: bodyChunks = null } = body || {};
   const cleanQuery = (message || query || '').trim();
   if (!cleanQuery) {
     return res.status(400).json({ detail: 'Message or query is required' });
   }
 
   const qLower = cleanQuery.toLowerCase();
-  let topicResponse = 'Retrieval across domain corpus identified relevant document evidence.';
-  if (qLower.includes('dental') || qLower.includes('insurance')) {
-    topicResponse = 'Six structural gaps identified: lack of flexible plans, missing AMC preventive models, high waiting periods, manual TPA settlements, uniform pricing excluding rural populations, and missing family priority pools.';
-  } else if (qLower.includes('neural') || qLower.includes('network') || qLower.includes('deep learning') || qLower.includes('cnn') || qLower.includes('densenet') || qLower.includes('neuron') || qLower.includes('snn') || qLower.includes('spik')) {
-    topicResponse = 'Neural networks encompass deep convolutional architectures (DenseNet121, 93.07% accuracy) for continuous representation learning, and Spiking Neural Networks (SNNs with Leaky Integrate-and-Fire neurons) for temporal event-driven neuromorphic inference.';
-  } else if (qLower.includes('densenet') || qLower.includes('cancer') || qLower.includes('histopath')) {
-    topicResponse = 'Magnification-specific DenseNet121 with Test-Time Augmentation (TTA) reaches 93.07% test accuracy and 0.9973 AUC on the BreakHis breast cancer histopathology dataset.';
-  } else if (qLower.includes('diet') || qLower.includes('pregnancy') || qLower.includes('maternal')) {
-    topicResponse = 'Nutritional guidelines recommend phased caloric and micronutrient scaling: 400-600 ug folic acid in T1, +340 kcal/day and 27mg iron in T2, and +452 kcal/day and 1000mg calcium in T3.';
-  } else if (qLower.includes('rinith') || qLower.includes('pendru') || qLower.includes('author') || qLower.includes('cgpa')) {
-    topicResponse = 'Pendru Rinith Reddy (Hallticket: 22EG105J21) is a B.Tech CSE researcher at Anurag University with a CGPA of 8.25 and primary author of the Aura AI Adaptive RAG framework.';
-  } else if (qLower.includes('rrf') || qLower.includes('density') || qLower.includes('edi') || qLower.includes('aura') || qLower.includes('rag')) {
-    topicResponse = 'Entity Density Index regulates fusion weights: higher entity densities scale graph weights (λ_graph), while conceptual questions favor dense vector semantic search (λ_vector).';
+  let topicResponse = 'No documents currently in Knowledge Vault. Upload files in the sidebar to run full cross-strategy evaluation.';
+  
+  // Extract dynamic synthesis from chunks if available
+  const incomingChunks = client_chunks || bodyChunks;
+  if (Array.isArray(incomingChunks) && incomingChunks.length > 0) {
+    const terms = qLower.replace(/[^\w\s]/g, ' ').split(/\s+/).filter(w => w.length > 2);
+    const matched = incomingChunks.find(c => {
+      const txt = (c.content || '').toLowerCase();
+      return terms.some(t => txt.includes(t));
+    });
+    if (matched) {
+      topicResponse = `Extracted grounded evidence from \`${matched.source || 'Uploaded Document'}\`: "${matched.content.slice(0, 180).trim()}..."`;
+    } else {
+      topicResponse = `Queried across ${incomingChunks.length} uploaded chunks. Ready for comparative retrieval analysis.`;
+    }
+  } else {
+    topicResponse = `Ready to evaluate retrieval strategies on "${cleanQuery}" once documents are uploaded to the Knowledge Vault.`;
   }
 
   return res.status(200).json({

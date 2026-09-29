@@ -1562,6 +1562,114 @@ html, body {
     display: none !important;
 }
 
+/* Knowledge Vault Dropzone & Clean Slate Controls */
+.clear-vault-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-vault-pill-btn:hover {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.drop-zone {
+    border: 1.5px dashed var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.015);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.drop-icon {
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+}
+
+.drop-zone:hover .drop-icon {
+    color: var(--primary);
+}
+
+.drop-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.drop-text strong {
+    font-size: 12px;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.drop-text span {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.vault-files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.vault-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+}
+
+.vault-file-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vault-file-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+}
+
+.vault-file-remove:hover {
+    color: #f87171;
+}
+
 /* Responsive Media Queries */
 @media (max-width: 900px) {
     .sidebar {

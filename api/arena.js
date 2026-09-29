@@ -26,9 +26,15 @@ export default async function handler(req, res) {
   let topicResponse = 'Retrieval across domain corpus identified relevant document evidence.';
   if (qLower.includes('dental') || qLower.includes('insurance')) {
     topicResponse = 'Six structural gaps identified: lack of flexible plans, missing AMC preventive models, high waiting periods, manual TPA settlements, uniform pricing excluding rural populations, and missing family priority pools.';
-  } else if (qLower.includes('neuron') || qLower.includes('snn') || qLower.includes('spik')) {
-    topicResponse = 'Leaky Integrate-and-Fire (LIF) models integrate incoming presynaptic spikes until membrane potential crosses threshold V_th, emitting an action potential before refractory reset.';
-  } else if (qLower.includes('rrf') || qLower.includes('density') || qLower.includes('edi')) {
+  } else if (qLower.includes('neural') || qLower.includes('network') || qLower.includes('deep learning') || qLower.includes('cnn') || qLower.includes('densenet') || qLower.includes('neuron') || qLower.includes('snn') || qLower.includes('spik')) {
+    topicResponse = 'Neural networks encompass deep convolutional architectures (DenseNet121, 93.07% accuracy) for continuous representation learning, and Spiking Neural Networks (SNNs with Leaky Integrate-and-Fire neurons) for temporal event-driven neuromorphic inference.';
+  } else if (qLower.includes('densenet') || qLower.includes('cancer') || qLower.includes('histopath')) {
+    topicResponse = 'Magnification-specific DenseNet121 with Test-Time Augmentation (TTA) reaches 93.07% test accuracy and 0.9973 AUC on the BreakHis breast cancer histopathology dataset.';
+  } else if (qLower.includes('diet') || qLower.includes('pregnancy') || qLower.includes('maternal')) {
+    topicResponse = 'Nutritional guidelines recommend phased caloric and micronutrient scaling: 400-600 ug folic acid in T1, +340 kcal/day and 27mg iron in T2, and +452 kcal/day and 1000mg calcium in T3.';
+  } else if (qLower.includes('rinith') || qLower.includes('pendru') || qLower.includes('author') || qLower.includes('cgpa')) {
+    topicResponse = 'Pendru Rinith Reddy (Hallticket: 22EG105J21) is a B.Tech CSE researcher at Anurag University with a CGPA of 8.25 and primary author of the Aura AI Adaptive RAG framework.';
+  } else if (qLower.includes('rrf') || qLower.includes('density') || qLower.includes('edi') || qLower.includes('aura') || qLower.includes('rag')) {
     topicResponse = 'Entity Density Index regulates fusion weights: higher entity densities scale graph weights (λ_graph), while conceptual questions favor dense vector semantic search (λ_vector).';
   }
 

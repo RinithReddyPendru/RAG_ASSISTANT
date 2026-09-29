@@ -27,6 +27,76 @@ export default function handler(req, res) {
       return res.status(404).json({ error: 'Graph data not found' });
     }
 
+    const { source, target } = req.query || {};
+    if (source && target) {
+      const s = source.trim().toLowerCase();
+      const t = target.trim().toLowerCase();
+
+      const nodeLookup = {};
+      data.nodes.forEach(n => {
+        nodeLookup[n.id.toLowerCase()] = n.id;
+      });
+
+      const realSource = nodeLookup[s];
+      const realTarget = nodeLookup[t];
+
+      if (!realSource || !realTarget) {
+        return res.status(404).json({
+          found: false,
+          detail: `Entity "${!realSource ? source : target}" was not found in the graph.`
+        });
+      }
+
+      const adj = {};
+      data.nodes.forEach(n => adj[n.id] = []);
+      data.edges.forEach(e => {
+        if (!adj[e.from]) adj[e.from] = [];
+        if (!adj[e.to]) adj[e.to] = [];
+        adj[e.from].push({ to: e.to, label: e.label });
+        adj[e.to].push({ to: e.from, label: e.label });
+      });
+
+      const queue = [[realSource]];
+      const visited = new Set([realSource]);
+
+      while (queue.length > 0) {
+        const currentPath = queue.shift();
+        const curr = currentPath[currentPath.length - 1];
+
+        if (curr === realTarget) {
+          const pathEdges = [];
+          const narrativeParts = [];
+          for (let i = 0; i < currentPath.length - 1; i++) {
+            const u = currentPath[i];
+            const v = currentPath[i + 1];
+            const edgeObj = (adj[u] || []).find(e => e.to === v);
+            const rel = edgeObj ? edgeObj.label : 'related_to';
+            pathEdges.push({ from: u, to: v, label: rel });
+            narrativeParts.push(`[${u}] --(${rel})--> [${v}]`);
+          }
+          return res.status(200).json({
+            found: true,
+            hops: currentPath.length - 1,
+            path_nodes: currentPath,
+            path_edges: pathEdges,
+            narrative: narrativeParts.join(' ➔ ')
+          });
+        }
+
+        for (const neighbor of (adj[curr] || [])) {
+          if (!visited.has(neighbor.to)) {
+            visited.add(neighbor.to);
+            queue.push([...currentPath, neighbor.to]);
+          }
+        }
+      }
+
+      return res.status(200).json({
+        found: false,
+        detail: `No path found between ${realSource} and ${realTarget}.`
+      });
+    }
+
     return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ error: err.message });

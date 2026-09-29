@@ -1,6 +1,9 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/graph/path", "destination": "/api/graph" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

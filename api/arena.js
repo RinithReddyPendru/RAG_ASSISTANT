@@ -11,13 +11,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ detail: 'Method not allowed' });
   }
 
-  const { message = '' } = req.body || {};
-  const query = message.trim();
-  if (!query) {
-    return res.status(400).json({ detail: 'Message is required' });
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) {}
   }
 
-  const qLower = query.toLowerCase();
+  const { message = '', query = '' } = body || {};
+  const cleanQuery = (message || query || '').trim();
+  if (!cleanQuery) {
+    return res.status(400).json({ detail: 'Message or query is required' });
+  }
+
+  const qLower = cleanQuery.toLowerCase();
   let topicResponse = 'Retrieval across domain corpus identified relevant document evidence.';
   if (qLower.includes('dental') || qLower.includes('insurance')) {
     topicResponse = 'Six structural gaps identified: lack of flexible plans, missing AMC preventive models, high waiting periods, manual TPA settlements, uniform pricing excluding rural populations, and missing family priority pools.';
@@ -28,7 +33,7 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({
-    query: query,
+    query: cleanQuery,
     comparisons: [
       {
         name: 'Naive Dense Vector (ChromaDB)',

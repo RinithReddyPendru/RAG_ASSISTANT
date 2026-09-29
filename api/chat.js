@@ -14,9 +14,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ detail: 'Method not allowed' });
   }
 
-  const { message = '', preferred_strategy = 'auto' } = req.body || {};
-  if (!message.trim()) {
-    return res.status(400).json({ detail: 'Message is required' });
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) {}
+  }
+
+  const { message = '', query = '', preferred_strategy = 'auto' } = body || {};
+  const userMessage = (message || query || '').trim();
+  if (!userMessage) {
+    return res.status(400).json({ detail: 'Message or query is required' });
   }
 
   try {
@@ -32,7 +38,7 @@ export default async function handler(req, res) {
       }
     }
 
-    const qLower = message.toLowerCase();
+    const qLower = userMessage.toLowerCase();
 
     // Strategy Routing
     let strategy = preferred_strategy;

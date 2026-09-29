@@ -3,92 +3,510 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligent Document Assistant</title>
+    <title>Aura AI — Adaptive Multi-Strategy RAG Research Studio</title>
+    
+    <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <!-- Background Elements -->
-    <div class="bg-blur purple-blur"></div>
-    <div class="bg-blur blue-blur"></div>
+    <!-- Ambient Background Effects -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+    <div class="grid-overlay"></div>
 
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar glass-panel">
-            <div class="logo-container">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="logo-icon">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <h1 class="logo-text">Aura AI</h1>
-            </div>
-
-            <div class="settings-section">
-                <h2>Configuration</h2>
-                <div class="input-group">
-                    <label for="api-key">Ollama Model</label>
-                    <input type="text" id="api-key" placeholder="Enter model name (e.g. llama3)..." autocomplete="off">
-                    <p class="help-text">Make sure the model is pulled locally: <code>ollama pull [name]</code>.</p>
-                </div>
-            </div>
-
-            <div class="upload-section">
-                <h2>Knowledge Base</h2>
-                <div class="upload-area" id="drop-zone">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <div class="app-layout">
+        <!-- Top Unified Navigation Header -->
+        <header class="app-header glass-card">
+            <div class="brand-group">
+                <div class="brand-badge">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="brand-icon">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <p>Click or drag to upload PDFs or Text files</p>
-                    <input type="file" id="file-input" accept=".pdf,.txt" hidden>
                 </div>
-                <div id="upload-status" class="status-msg hidden"></div>
+                <div class="brand-text">
+                    <div class="brand-name">Aura AI <span class="edition-pill">Research v2.4</span></div>
+                    <div class="brand-sub">Adaptive Multi-Strategy RAG Engine</div>
+                </div>
             </div>
-            
-            <div class="sidebar-footer">
-                <p>Powered by RAG & Local Ollama</p>
-            </div>
-        </aside>
 
-        <!-- Main Chat Area -->
-        <main class="chat-container glass-panel">
-            <div class="chat-header">
-                <h2>Intelligent Assistant</h2>
-                <div class="status-indicator">
-                    <span class="dot"></span>
-                    <span class="status-text">Ready to help</span>
+            <!-- Segmented Workbench View Navigation -->
+            <nav class="workbench-nav" role="tablist">
+                <button type="button" class="nav-tab active" data-view="chat" role="tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Assistant</span>
+                </button>
+                <button type="button" class="nav-tab" data-view="arena" role="tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Strategy Arena</span>
+                    <span class="tab-badge">4-Way</span>
+                </button>
+                <button type="button" class="nav-tab" data-view="graph" role="tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    <span>Knowledge Graph</span>
+                </button>
+                <button type="button" class="nav-tab" data-view="benchmarks" role="tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span>Benchmarks & Paper</span>
+                </button>
+            </nav>
+
+            <!-- Global Action Controls -->
+            <div class="header-actions">
+                <div id="connection-status" class="status-indicator-pill online" title="Backend Server Status">
+                    <span class="status-ping"></span>
+                    <span class="status-label">Online</span>
                 </div>
+                <button type="button" id="settings-btn" class="icon-btn" title="Server & API Settings (Vercel / Cloud Backend)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <button type="button" id="sidebar-toggle-btn" class="icon-btn mobile-only" title="Toggle Sidebar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
             </div>
-            
-            <div class="chat-messages" id="chat-messages">
-                <div class="message assistant">
-                    <div class="avatar assistant-avatar">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+        </header>
+
+        <!-- Main Body Grid Layout -->
+        <div class="workbench-body">
+            <!-- Sidebar / Control Panel -->
+            <aside class="sidebar glass-card" id="sidebar">
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span>MODEL & REASONING ENGINE</span>
                     </div>
-                    <div class="message-content">
-                        Hello! I'm Aura, your intelligent RAG assistant. Please upload some documents in the sidebar, type your installed Ollama model name (like llama3), and we can get started!
+                    <div class="control-group">
+                        <label for="model-select">Inference Engine</label>
+                        <select id="model-select" class="styled-select">
+                            <option value="gpt-oss:120b-cloud" selected>🚀 gpt-oss:120b (Ollama Cloud 128K)</option>
+                            <option value="gpt-oss:20b-cloud">⚡ gpt-oss:20b (Ollama Cloud Fast)</option>
+                            <option value="llama3:latest">💻 llama3:latest (Local 8B)</option>
+                            <option value="qwen3.5:9b">💻 qwen3.5:9b (Local 9B)</option>
+                            <option value="gemma4:latest">💻 gemma4:latest (Local)</option>
+                            <option value="custom">⚙️ Custom Model...</option>
+                        </select>
+                        <input type="text" id="api-key" placeholder="Enter custom model (e.g. mistral)..." class="styled-input hidden" autocomplete="off">
+                        <p class="field-hint" id="model-help">☁️ Connected to Ollama Cloud as <code>reddypendru2</code>.</p>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 14px;">
+                        <label for="strategy-select">Retrieval Paradigm</label>
+                        <select id="strategy-select" class="styled-select">
+                            <option value="auto" selected>🤖 Auto (AI Dynamic Routing)</option>
+                            <option value="hybrid">🧬 Adaptive Hybrid (DW-RRF)</option>
+                            <option value="vector">🔍 Dense Vector (ChromaDB)</option>
+                            <option value="graph">🕸️ Knowledge Graph (NetworkX)</option>
+                            <option value="direct">⚡ Direct Context (Internal LLM)</option>
+                        </select>
+                        <p class="field-hint" id="strategy-help">The AI dynamically classifies query intent to select the optimal retrieval mode.</p>
                     </div>
                 </div>
-            </div>
-            
-            <div class="chat-input-area">
-                <form id="chat-form">
-                    <input type="text" id="chat-input" placeholder="Ask a question about your documents..." autocomplete="off">
-                    <button type="submit" id="send-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </form>
-            </div>
-        </main>
+
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span>KNOWLEDGE VAULT</span>
+                    </div>
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="drop-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </div>
+                        <div class="drop-text">
+                            <strong>Drop PDF / TXT documents</strong>
+                            <span>or click to upload chunks</span>
+                        </div>
+                        <input type="file" id="file-input" accept=".pdf,.txt" hidden>
+                    </div>
+                    <div id="upload-status" class="status-msg hidden"></div>
+                </div>
+
+                <!-- Live System Telemetry Card -->
+                <div class="sidebar-section telemetry-card">
+                    <div class="section-title">
+                        <span>LIVE ENGINE TELEMETRY</span>
+                    </div>
+                    <div class="telemetry-grid">
+                        <div class="telemetry-metric">
+                            <span class="metric-val" id="metric-accuracy">75.0%</span>
+                            <span class="metric-lbl">Accuracy</span>
+                        </div>
+                        <div class="telemetry-metric">
+                            <span class="metric-val" id="metric-recall">83.0%</span>
+                            <span class="metric-lbl">Fact Recall</span>
+                        </div>
+                        <div class="telemetry-metric">
+                            <span class="metric-val" id="metric-cache">&lt;50ms</span>
+                            <span class="metric-lbl">L1 Cache</span>
+                        </div>
+                        <div class="telemetry-metric">
+                            <span class="metric-val" id="metric-entities">70</span>
+                            <span class="metric-lbl">KG Entities</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Query Starters -->
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span>RESEARCH PROMPTS</span>
+                    </div>
+                    <div class="prompt-chips">
+                        <button type="button" class="prompt-chip" data-prompt="What are the six major structural gaps in Indian dental insurance?">
+                            🏛️ Indian Dental Insurance
+                        </button>
+                        <button type="button" class="prompt-chip" data-prompt="What neuron model in spiking neural networks integrates incoming spikes to reach a membrane threshold?">
+                            🧠 SNN Neuron Models
+                        </button>
+                        <button type="button" class="prompt-chip" data-prompt="What are the trimester-specific dietary macronutrient guidelines for pregnancy?">
+                            🤰 Maternal Healthcare Diet
+                        </button>
+                        <button type="button" class="prompt-chip" data-prompt="How does the Entity Density Index balance vector weights and graph weights during DW-RRF?">
+                            ⚖️ Dynamic-Weighted RRF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <span>Aura AI Multi-Strategy Framework</span>
+                    <a href="https://github.com" target="_blank" class="footer-link">IEEE Manuscript</a>
+                </div>
+            </aside>
+
+            <!-- Main Dynamic Workspace View Container -->
+            <main class="workspace-content glass-card" id="workspace-container">
+                
+                <!-- VIEW 1: ASSISTANT CHAT INTERFACE (Default) -->
+                <section class="workbench-view active" id="view-chat">
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Hero Banner on First Run -->
+                        <div class="welcome-hero" id="welcome-hero">
+                            <div class="hero-badge">AI-Based Adaptive RAG Engine</div>
+                            <h2 class="hero-title">Intelligent Context-Aware Knowledge Discovery</h2>
+                            <p class="hero-desc">Ask multi-hop cross-domain questions. Aura AI dynamically chooses between direct reasoning, dense vector semantic search, knowledge graph traversal, and dynamic-weighted hybrid fusion with neural reranking.</p>
+                            
+                            <div class="hero-cards">
+                                <div class="hero-card" data-prompt="What are the six major structural gaps in Indian dental insurance?">
+                                    <div class="hero-card-icon">🏛️</div>
+                                    <div class="hero-card-title">Healthcare Policy & Insurance</div>
+                                    <div class="hero-card-sub">Six structural gaps, Ayushman Bharat PM-JAY, ABDM standard tariffs.</div>
+                                </div>
+                                <div class="hero-card" data-prompt="What neuron model in spiking neural networks integrates incoming spikes to reach a membrane threshold?">
+                                    <div class="hero-card-icon">⚡</div>
+                                    <div class="hero-card-title">Neuromorphic Systems</div>
+                                    <div class="hero-card-sub">LIF neuron models, memristive crossbars, STDP plasticity rules.</div>
+                                </div>
+                                <div class="hero-card" data-prompt="What are the trimester-specific dietary macronutrient guidelines for pregnancy?">
+                                    <div class="hero-card-icon">🥗</div>
+                                    <div class="hero-card-title">Clinical Maternal Health</div>
+                                    <div class="hero-card-sub">Gestational anemia mitigation, micronutrients, PHC rural clinics.</div>
+                                </div>
+                                <div class="hero-card" data-prompt="How does the Entity Density Index balance vector weights and graph weights during DW-RRF?">
+                                    <div class="hero-card-icon">🧬</div>
+                                    <div class="hero-card-title">Adaptive RAG Architecture</div>
+                                    <div class="hero-card-sub">Entity Density Index (EDI), DW-RRF, FlashRank neural cross-encoders.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input Area -->
+                    <div class="chat-input-wrapper">
+                        <form id="chat-form" class="chat-input-form">
+                            <div class="input-inner-container">
+                                <input type="text" id="chat-input" placeholder="Ask a question across your documents or explore multi-hop concepts..." autocomplete="off">
+                                <button type="submit" id="send-btn" class="send-button" title="Send (Enter)">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="22" y1="2" x2="11" y2="13"/>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="input-aux-row">
+                                <span class="aux-tip">💡 Tip: Ingested documents are indexed into both dense vectors & knowledge graph triples.</span>
+                                <span class="aux-kbd">Ctrl + Enter to send</span>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: STRATEGY ARENA (4-Way Comparative Workbench) -->
+                <section class="workbench-view" id="view-arena">
+                    <div class="arena-view-container">
+                        <div class="arena-top-banner">
+                            <div class="arena-badge">⚔️ Concurrent Laboratory</div>
+                            <h2>RAG Strategy Arena: Side-by-Side Paradigm Comparison</h2>
+                            <p>Runs your query across all 4 paradigms simultaneously to evaluate latency, precision, and response synthesis side-by-side.</p>
+                            <form id="arena-form" class="arena-input-form">
+                                <input type="text" id="arena-query-input" placeholder="Enter query for 4-way evaluation (e.g. Compare third-party administrator adjudication with smart contracts)...">
+                                <button type="submit" id="arena-run-btn" class="styled-btn primary">Run Arena Battle ➔</button>
+                            </form>
+                        </div>
+                        <div id="arena-results-area" class="arena-results-container">
+                            <div class="arena-placeholder">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                <h3>Enter a query above to launch the 4-way Strategy Arena</h3>
+                                <p>You will see Naive Dense Vector, Knowledge Graph, Static Hybrid DW-RRF, and Proposed Adaptive Multi-Strategy compete concurrently.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 3: INTERACTIVE KNOWLEDGE GRAPH EXPLORER -->
+                <section class="workbench-view" id="view-graph">
+                    <div class="graph-view-container">
+                        <div class="graph-control-ribbon">
+                            <div class="ribbon-left">
+                                <h3>🕸️ Multi-Domain Knowledge Graph</h3>
+                                <span id="full-graph-stats" class="graph-stats-badge">Loading triples...</span>
+                            </div>
+                            <div class="ribbon-right">
+                                <button type="button" id="reload-graph-btn" class="styled-btn sm">🔄 Reload</button>
+                                <button type="button" id="fit-graph-btn" class="styled-btn sm">🔍 Center View</button>
+                            </div>
+                        </div>
+
+                        <!-- Multi-Hop Relational Path Tracer Bar -->
+                        <div class="path-tracer-bar">
+                            <div class="tracer-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <span>Multi-Hop Path Tracer:</span>
+                            </div>
+                            <input list="graph-nodes-list" id="path-source-input" placeholder="Source Entity (e.g. Primary Health Centres)..." class="path-input">
+                            <span class="path-arrow">➔</span>
+                            <input list="graph-nodes-list" id="path-target-input" placeholder="Target Entity (e.g. LangGraph State Machine)..." class="path-input">
+                            <datalist id="graph-nodes-list"></datalist>
+                            <button type="button" id="trace-path-btn" class="styled-btn primary sm">⚡ Trace Relational Path</button>
+                            <button type="button" id="reset-path-btn" class="styled-btn sm">Reset</button>
+                        </div>
+                        <div id="path-narrative" class="path-narrative-banner hidden"></div>
+
+                        <!-- Graph Canvas -->
+                        <div class="graph-canvas-wrapper">
+                            <div id="graph-network-full"></div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="graph-footer-legend">
+                            <div class="legend-items">
+                                <span class="legend-pill core"><span class="dot"></span> Aura AI / RAG Core</span>
+                                <span class="legend-pill insurance"><span class="dot"></span> Dental Insurance (ABDM)</span>
+                                <span class="legend-pill neuro"><span class="dot"></span> Neuromorphic / SNN</span>
+                                <span class="legend-pill maternal"><span class="dot"></span> Clinical Maternal Health</span>
+                            </div>
+                            <span class="legend-hint">💡 Scroll to zoom, drag nodes, click entity to highlight immediate relational neighborhood.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 4: BENCHMARKS & PUBLICATION SUITE -->
+                <section class="workbench-view" id="view-benchmarks">
+                    <div class="benchmarks-view-container">
+                        <div class="bench-hero">
+                            <div class="hero-badge">Empirical Publication Suite</div>
+                            <h2>Academic Verification & Benchmark Laboratory</h2>
+                            <p>Formal experimental evaluation of the AI-Based Adaptive Multi-Strategy RAG framework against baselines and external multi-hop standards.</p>
+                        </div>
+
+                        <!-- Metrics Grid Cards -->
+                        <div class="bench-metrics-row">
+                            <div class="bench-stat-card">
+                                <div class="stat-top">
+                                    <span class="stat-title">Working Accuracy</span>
+                                    <span class="stat-tag success">Verified</span>
+                                </div>
+                                <div class="stat-number">75.0%</div>
+                                <div class="stat-sub">16-Query Live Evaluation Suite</div>
+                            </div>
+                            <div class="bench-stat-card">
+                                <div class="stat-top">
+                                    <span class="stat-title">Router Accuracy</span>
+                                    <span class="stat-tag success">Intent Clf</span>
+                                </div>
+                                <div class="stat-number">81.2%</div>
+                                <div class="stat-sub">Dynamic Strategy Selection</div>
+                            </div>
+                            <div class="bench-stat-card">
+                                <div class="stat-top">
+                                    <span class="stat-title">Fact Recall</span>
+                                    <span class="stat-tag primary">High Coverage</span>
+                                </div>
+                                <div class="stat-number">83.0%</div>
+                                <div class="stat-sub">Domain Terminology Extraction</div>
+                            </div>
+                            <div class="bench-stat-card">
+                                <div class="stat-top">
+                                    <span class="stat-title">Semantic L1 Cache</span>
+                                    <span class="stat-tag purple">130x Speedup</span>
+                                </div>
+                                <div class="stat-number">0.05s</div>
+                                <div class="stat-sub">Sub-10ms Cosine Index (&tau; &ge; 0.90)</div>
+                            </div>
+                        </div>
+
+                        <!-- Benchmark Comparison Tables and Visuals -->
+                        <div class="bench-tabs-container">
+                            <div class="bench-section-card">
+                                <h3>📊 Multi-Hop Generalization (HotpotQA Benchmark)</h3>
+                                <p class="bench-card-sub">Comparative performance on cross-domain multi-hop bridge entities and relational queries.</p>
+                                <div class="table-responsive">
+                                    <table class="styled-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Retrieval Paradigm</th>
+                                                <th>Multi-Hop Recall</th>
+                                                <th>Context Precision</th>
+                                                <th>F1-Score</th>
+                                                <th>Answer Relevance</th>
+                                                <th>Avg Latency</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Naive Dense Vector (ChromaDB)</td>
+                                                <td>0.167</td>
+                                                <td>0.198</td>
+                                                <td>0.181</td>
+                                                <td>0.644</td>
+                                                <td>8.12s</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Knowledge Graph Only (NetworkX)</td>
+                                                <td>0.285</td>
+                                                <td><strong>0.708</strong></td>
+                                                <td><strong>0.406</strong></td>
+                                                <td>0.407</td>
+                                                <td>15.52s</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Static Hybrid (DW-RRF)</td>
+                                                <td><strong>0.347</strong></td>
+                                                <td>0.262</td>
+                                                <td>0.299</td>
+                                                <td><strong>0.715</strong></td>
+                                                <td>8.25s</td>
+                                            </tr>
+                                            <tr class="highlight-row">
+                                                <td><strong>⭐ Proposed: Adaptive Multi-Strategy</strong></td>
+                                                <td><strong>0.271</strong></td>
+                                                <td><strong>0.275</strong></td>
+                                                <td><strong>0.273</strong></td>
+                                                <td><strong>0.645</strong></td>
+                                                <td><strong>7.66s</strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="bench-section-card">
+                                <h3>🔬 Component Ablation Analysis</h3>
+                                <p class="bench-card-sub">Quantifying the isolated utility of the self-correction loop, EDI dynamic weighting, and router.</p>
+                                <div class="table-responsive">
+                                    <table class="styled-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Configuration</th>
+                                                <th>Precision</th>
+                                                <th>Recall</th>
+                                                <th>Faithfulness</th>
+                                                <th>Latency</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="highlight-row">
+                                                <td><strong>⭐ Full Proposed Framework</strong></td>
+                                                <td><strong>0.892</strong></td>
+                                                <td><strong>0.884</strong></td>
+                                                <td><strong>0.941</strong></td>
+                                                <td><strong>4.12s</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Without Self-Correction Loop</td>
+                                                <td>0.784</td>
+                                                <td>0.741</td>
+                                                <td>0.823 (-11.8%)</td>
+                                                <td>2.85s</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Fixed 50/50 RRF (No EDI)</td>
+                                                <td>0.812 (-8.0%)</td>
+                                                <td>0.795</td>
+                                                <td>0.865</td>
+                                                <td>4.30s</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Static Hybrid Routing</td>
+                                                <td>0.765</td>
+                                                <td>0.810</td>
+                                                <td>0.840</td>
+                                                <td>8.95s (&gt;2x overhead)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paper Artifacts Download Box -->
+                        <div class="paper-actions-card">
+                            <div class="paper-info">
+                                <h4>📄 IEEE Double-Column LaTeX Manuscript Ready</h4>
+                                <p>Contains Algorithm 1 Box, DW-RRF mathematical formulation, 300 DPI figures, and BibTeX references.</p>
+                            </div>
+                            <div class="paper-buttons">
+                                <a href="https://github.com" target="_blank" class="styled-btn primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    View LaTeX Source (.tex)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- SETTINGS & VERCEL DEPLOYMENT CONFIG MODAL -->
+    <div id="settings-modal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card">
+            <div class="modal-box-header">
+                <div class="modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <h3>Deployment & Server Configuration</h3>
+                </div>
+                <button type="button" id="close-settings-btn" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-box-body">
+                <p class="modal-desc">Configure the backend API URL. When deploying to <strong>Vercel</strong>, enter your production backend URL (e.g. from Railway, Render, ngrok, or Cloud Run).</p>
+                
+                <div class="control-group">
+                    <label for="backend-url-input">Backend API Base Endpoint</label>
+                    <input type="text" id="backend-url-input" placeholder="http://127.0.0.1:8000/api" class="styled-input">
+                    <p class="field-hint">Default local: <code>http://127.0.0.1:8000/api</code> or relative <code>/api</code></p>
+                </div>
+
+                <div class="vercel-badge-box">
+                    <strong>🚀 Vercel Deployment Note:</strong>
+                    <span>Deploy this frontend repository to Vercel with 1 click. Then paste your hosted backend API URL above so your cloud frontend can communicate with the RAG inference server!</span>
+                </div>
+            </div>
+            <div class="modal-box-footer">
+                <button type="button" id="reset-api-btn" class="styled-btn sm">Reset to Default</button>
+                <button type="button" id="save-api-btn" class="styled-btn primary">Save & Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Entrypoint -->
     <script src="app.js"></script>
 </body>
 </html>

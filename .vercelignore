@@ -1,0 +1,12 @@
+venv/
+backend/
+data/
+eval_results/
+paper/
+assets/
+backend.zip
+*.bat
+__pycache__/
+*.pyc
+.git/
+.env

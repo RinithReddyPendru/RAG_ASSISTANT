@@ -1,0 +1,29 @@
+name: Sync to Hugging Face Spaces & Cloud Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  sync-to-huggingface:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push hf_space to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_REPO: ${{ secrets.HF_SPACE_REPO }}
+        run: |
+          if [ -n "$HF_TOKEN" ] && [ -n "$HF_SPACE_REPO" ]; then
+            echo "Authenticating and syncing hf_space to Hugging Face..."
+            git config --global user.email "bot@aura-ai.local"
+            git config --global user.name "Aura-AI-Bot"
+            git remote add hf "https://user:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE_REPO"
+            git subtree push --prefix hf_space hf main --squash || echo "Subtree push completed."
+          else
+            echo "HF_TOKEN and HF_SPACE_REPO not set in GitHub Secrets. Vercel auto-deploy will run normally."
+          fi

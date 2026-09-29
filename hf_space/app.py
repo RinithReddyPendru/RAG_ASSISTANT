@@ -216,9 +216,22 @@ async def arena_compare(request: ArenaRequest):
             })
     return {"query": request.message, "comparisons": results}
 
-# Mount frontend static files at the root route
-app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "..", "frontend"), html=True), name="frontend")
+@app.get("/")
+def read_root():
+    return {
+        "status": "online",
+        "service": "Aura AI Adaptive RAG Backend",
+        "platform": "Hugging Face Spaces (16GB RAM)",
+        "endpoints": [
+            "/api/chat",
+            "/api/arena",
+            "/api/graph",
+            "/api/graph/path",
+            "/api/upload"
+        ]
+    }
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=7860, reload=False)
+

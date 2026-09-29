@@ -1,0 +1,18 @@
+{
+  "name": "aura-ai-frontend",
+  "version": "2.4.0",
+  "type": "module",
+  "description": "Aura AI — Adaptive Multi-Strategy RAG Research Studio Frontend",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "deploy": "vercel"
+  },
+  "keywords": [
+    "rag",
+    "adaptive-rag",
+    "langgraph",
+    "research-workbench"
+  ],
+  "author": "",
+  "license": "MIT"
+}

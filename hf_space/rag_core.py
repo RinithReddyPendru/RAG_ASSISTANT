@@ -11,9 +11,9 @@ from langchain_community.graphs import NetworkxEntityGraph
 from langchain_experimental.graph_transformers import LLMGraphTransformer
 import pickle
 
-DB_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "chroma_db")
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "docs")
-GRAPH_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "graph.pkl")
+DB_DIR = os.path.join(os.path.dirname(__file__), "data", "chroma_db")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data", "docs")
+GRAPH_DIR = os.path.join(os.path.dirname(__file__), "data", "graph.pkl")
 
 # Initialize embeddings locally (free)
 try:

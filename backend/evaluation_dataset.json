@@ -1,0 +1,26 @@
+[
+    {
+        "question": "What is neuromorphic computing?",
+        "ground_truth": "Neuromorphic computing refers to designing hardware that mimics the neural structure and operation of the human brain to achieve high efficiency.",
+        "ground_truth_context": [
+            "Neuromorphic computing refers to designing hardware that mimics the neural structure",
+            "mimics the neural structure and operation of the human brain"
+        ]
+    },
+    {
+        "question": "How does Agentic Hybrid Graph RAG improve retrieval?",
+        "ground_truth": "It improves retrieval by fusing semantic vector search with structural knowledge graph traversal, reducing hallucinated similarities and providing a self-correcting agent loop.",
+        "ground_truth_context": [
+            "fusing semantic vector search with structural knowledge graph traversal",
+            "reducing hallucinated similarities and providing a self-correcting agent loop"
+        ]
+    },
+    {
+        "question": "What model is used for the LLM grading layer?",
+        "ground_truth": "The system utilizes Ollama serving the llama3.2 model for the LLM grading.",
+        "ground_truth_context": [
+            "utilizes Ollama serving the llama3.2 model",
+            "for the LLM grading layer"
+        ]
+    }
+]

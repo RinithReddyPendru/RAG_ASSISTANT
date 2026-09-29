@@ -651,6 +651,11 @@ To learn and answer questions:
             });
         });
 
+        if (welcomeHero) {
+            welcomeHero.style.display = "none";
+        }
+        isFirstMessage = false;
+
         if (chatMessages) {
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -675,6 +680,11 @@ To learn and answer questions:
                 </div>
             </div>
         `;
+
+        if (welcomeHero) {
+            welcomeHero.style.display = "none";
+        }
+        isFirstMessage = false;
 
         if (chatMessages) {
             chatMessages.appendChild(msgDiv);
@@ -713,9 +723,10 @@ To learn and answer questions:
                 if (chatMessages) {
                     chatMessages.innerHTML = "";
                     if (welcomeHero) {
-                        welcomeHero.style.display = "flex";
+                        welcomeHero.style.display = "block";
                         chatMessages.appendChild(welcomeHero);
                     }
+                    isFirstMessage = true;
                 }
                 showUploadStatus("Knowledge Vault completely cleared. Memory erased.", "success");
             }

@@ -384,7 +384,7 @@ To learn and answer questions:
             ];
         } else {
             // Dynamic Extractive RAG over whatever chunks exist
-            const STOP_WORDS = new Set(['what', 'is', 'a', 'the', 'in', 'on', 'of', 'for', 'to', 'and', 'with', 'by', 'how', 'does', 'why', 'who', 'are', 'was', 'were', 'an', 'at', 'from', 'as', 'tell', 'me', 'about', 'explain']);
+            const STOP_WORDS = new Set(['what', 'is', 'a', 'the', 'in', 'on', 'of', 'for', 'to', 'and', 'with', 'by', 'how', 'does', 'why', 'who', 'are', 'was', 'were', 'an', 'at', 'from', 'as', 'tell', 'me', 'about', 'explain', 'which']);
             const queryTerms = qLower.replace(/[^\w\s]/g, ' ').split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS.has(w));
             
             const scoredChunks = chunks.map((c, i) => {
@@ -392,65 +392,106 @@ To learn and answer questions:
                 const source = (c.source || '').toLowerCase();
                 let score = 0;
                 for (const term of queryTerms) {
-                    if (source.includes(term)) score += 10;
+                    if (source.includes(term)) score += 15;
                     const matches = text.match(new RegExp('\\b' + term, 'gi'));
-                    if (matches) score += matches.length * 3;
+                    if (matches) score += matches.length * 4;
                 }
                 for (let j = 0; j < queryTerms.length - 1; j++) {
                     const bigram = queryTerms[j] + ' ' + queryTerms[j + 1];
-                    if (text.includes(bigram)) score += 25;
+                    if (text.includes(bigram)) score += 30;
                 }
                 return { chunk: c, index: i, score };
             });
 
             scoredChunks.sort((a, b) => b.score - a.score);
-            const topChunks = scoredChunks.filter(sc => sc.score > 0).slice(0, 3);
+            const topChunks = scoredChunks.filter(sc => sc.score > 0).slice(0, 4);
 
             if (topChunks.length > 0) {
-                const extracted = [];
+                const extractedSentences = [];
                 topChunks.forEach((item, cIdx) => {
-                    const cleanContent = item.chunk.content.replace(/\r\n/g, '\n').replace(/\n+/g, ' ');
-                    const sentences = cleanContent.split(/(?<=[.?!])\s+/);
-                    const scoredSents = sentences.map(s => {
-                        const sLower = s.toLowerCase();
+                    const cleanContent = item.chunk.content
+                        .replace(/--- Page \d+ ---/gi, '')
+                        .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '')
+                        .replace(/\(\d{3}\)\s*\d{3}-\d{4}/g, '')
+                        .replace(/linkedin\.com\/\S+/g, '')
+                        .replace(/\r\n/g, '\n')
+                        .replace(/[ \t]+/g, ' ')
+                        .trim();
+
+                    const rawSents = cleanContent.split(/(?<=[.?!])\s+/);
+                    rawSents.forEach(s => {
+                        const trimmed = s.replace(/^[-•*–—\s\d.)]+/, '').trim();
+                        if (trimmed.length < 25 || trimmed.endsWith(':') || trimmed.split(' ').length < 4) return;
+                        const sLower = trimmed.toLowerCase();
                         let sScore = 0;
                         for (const t of queryTerms) {
-                            if (sLower.includes(t)) sScore += 2;
+                            if (sLower.includes(t)) sScore += 3;
                         }
-                        return { s: s.trim(), score: sScore };
-                    }).filter(s => s.score > 0 && s.s.length > 25);
-
-                    scoredSents.sort((a, b) => b.score - a.score);
-                    if (scoredSents.length > 0) {
-                        extracted.push({
-                            source: item.chunk.source || 'Uploaded Document',
-                            sentence: scoredSents[0].s,
-                            supporting: scoredSents.slice(1, 2).map(x => x.s).join(' '),
-                            chunkIdx: cIdx
-                        });
-                    }
-                });
-
-                if (extracted.length > 0) {
-                    synthesis = `Based on dynamic retrieval across your uploaded documents for **"${question}"**:\n\n`;
-                    extracted.forEach((p, idx) => {
-                        synthesis += `* **From \`${p.source}\`** <span class="citation-tag" data-chunk="${idx}">[${idx + 1}]</span>: ${p.sentence}\n`;
-                        if (p.supporting) {
-                            synthesis += `  ${p.supporting}\n\n`;
+                        if (/\d+/.test(trimmed)) sScore += 2;
+                        if (sScore > 0) {
+                            extractedSentences.push({
+                                source: item.chunk.source || 'Uploaded Document',
+                                sentence: trimmed,
+                                score: sScore,
+                                chunkIdx: cIdx
+                            });
                         }
                     });
+                });
 
-                    contextSnippets = topChunks.map(tc => `${tc.chunk.source || 'Uploaded Document'}:\n${tc.chunk.content.slice(0, 350).replace(/\s+/g, ' ')}...`);
+                extractedSentences.sort((a, b) => b.score - a.score);
+
+                // Deduplicate sentences
+                const uniqueSentences = [];
+                const seenTexts = new Set();
+                for (const item of extractedSentences) {
+                    const key = item.sentence.slice(0, 45).toLowerCase();
+                    if (!seenTexts.has(key)) {
+                        seenTexts.add(key);
+                        uniqueSentences.push(item);
+                    }
+                    if (uniqueSentences.length >= 4) break;
+                }
+
+                function highlightMetrics(text) {
+                    return text
+                        .replace(/(\bT[12]\s*=\s*\d+[\s\wμu]*)/gi, '**$1**')
+                        .replace(/(\b\d+(?:\.\d+)?\s*(?:microseconds|μs|us|nanoseconds|ns|milliseconds|ms|kelvin|K|mK|GHz|MHz|%|percent|qubits|logical qubits)\b)/gi, '**$1**')
+                        .replace(/(CVE-\d{4}-\d+)/gi, '**$1**')
+                        .replace(/(\bAPT-\d+\b)/gi, '**$1**')
+                        .replace(/(tau\s*=\s*0\.\d+)/gi, '**$1**');
+                }
+
+                if (uniqueSentences.length > 0) {
+                    const isSummaryQuery = qLower.includes('summarize') || qLower.includes('summary') || qLower.includes('overview') || qLower.includes('background') || qLower.includes('profile');
+                    const primary = uniqueSentences[0];
+
+                    if (isSummaryQuery) {
+                        synthesis = `### Executive Summary\n\n`;
+                        synthesis += `${highlightMetrics(primary.sentence)} <span class="citation-tag" data-chunk="${primary.chunkIdx}">[${primary.chunkIdx + 1}]</span>\n\n`;
+                        if (uniqueSentences.length > 1) {
+                            synthesis += `### Key Highlights & Technical Experience\n\n`;
+                            uniqueSentences.slice(1).forEach((item) => {
+                                synthesis += `* **From \`${item.source}\`** <span class="citation-tag" data-chunk="${item.chunkIdx}">[${item.chunkIdx + 1}]</span>: ${highlightMetrics(item.sentence)}\n`;
+                            });
+                        }
+                    } else {
+                        synthesis = `### Direct Answer\n\n`;
+                        synthesis += `${highlightMetrics(primary.sentence)} <span class="citation-tag" data-chunk="${primary.chunkIdx}">[${primary.chunkIdx + 1}]</span>\n\n`;
+                        if (uniqueSentences.length > 1) {
+                            synthesis += `### Grounded Technical Evidence\n\n`;
+                            uniqueSentences.slice(1).forEach((item) => {
+                                synthesis += `* **From \`${item.source}\`** <span class="citation-tag" data-chunk="${item.chunkIdx}">[${item.chunkIdx + 1}]</span>: ${highlightMetrics(item.sentence)}\n`;
+                            });
+                        }
+                    }
+
+                    contextSnippets = topChunks.map(tc => `${tc.chunk.source || 'Uploaded Document'}:\n${tc.chunk.content.replace(/--- Page \d+ ---/gi, '').slice(0, 350).replace(/\s+/g, ' ')}...`);
                 }
             }
 
             if (!synthesis) {
-                synthesis = `I searched your uploaded documents (${chunks.length} chunks indexed) for **"${question}"**, but could not find direct high-confidence evidence matching your terms.
-
-* **Suggestions**:
-  * Try rephrasing your question or using broader keywords.
-  * Ensure the document covering this topic is uploaded to the Knowledge Vault.`;
-
+                synthesis = `I searched your uploaded documents (${chunks.length} chunks indexed) for **"${question}"**, but could not find direct high-confidence evidence matching your terms.\n\n* **Suggestions**:\n  * Try rephrasing your question or using broader keywords.\n  * Ensure the document covering this topic is uploaded to the Knowledge Vault.`;
                 contextSnippets = chunks.slice(0, 2).map((c, i) => `${c.source || `Document Chunk ${i + 1}`}:\n${c.content.slice(0, 250)}...`);
             }
         }
@@ -624,7 +665,8 @@ To learn and answer questions:
             `;
 
             const bodyContent = meta.annotated_response ? meta.annotated_response : formattedContent;
-            formattedContent = metaHtml + (window.marked && !meta.annotated_response ? marked.parse(bodyContent) : bodyContent) + contextAccordion;
+            const parsedBody = window.marked ? marked.parse(bodyContent) : `<p>${bodyContent}</p>`;
+            formattedContent = metaHtml + parsedBody + contextAccordion;
         }
 
         msgDiv.innerHTML = `
@@ -780,7 +822,7 @@ To learn and answer questions:
                             const page = await pdfDoc.getPage(pageNum);
                             const textContent = await page.getTextContent();
                             const pageItems = textContent.items.map(item => item.str).join(" ");
-                            extractedText += `\n--- Page ${pageNum} ---\n` + pageItems;
+                            extractedText += `\n\n` + pageItems;
                         }
                         text = extractedText.trim();
                     } catch (pdfErr) {
